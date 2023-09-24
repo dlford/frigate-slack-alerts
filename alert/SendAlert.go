@@ -46,7 +46,7 @@ func SendAlert(
 		slackClient.PostMessage(slackChannel, slack.MsgOptionText(messageText, false))
 	} else {
 		imgURL := fmt.Sprintf("%s/api/events/%s/snapshot.jpg", internalBaseURL, values.ID)
-		imgFile := fmt.Sprintf("tmp/%s.jpg", values.ID)
+		imgFile := fmt.Sprintf("/tmp/%s.jpg", values.ID)
 
 		response, err := http.Get(imgURL)
 		if err != nil {
