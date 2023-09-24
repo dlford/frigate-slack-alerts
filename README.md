@@ -1,0 +1,2 @@
+# Frigate Slack Alerts
+
