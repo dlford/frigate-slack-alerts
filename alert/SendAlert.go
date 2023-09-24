@@ -38,6 +38,8 @@ func SendAlert(
 		messageText = fmt.Sprintf("%s in zones: %s.", messageText, strings.Join(zones, ", "))
 	}
 
+	messageText = fmt.Sprintf("%s\nView events: %s/events", messageText, extenalBaseURL)
+
 	slackClient := slack.New(slackToken)
 
 	if !values.HasSnapshot {

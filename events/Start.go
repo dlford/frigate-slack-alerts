@@ -32,7 +32,7 @@ func Start(
 	}
 
 	var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-		fmt.Printf("Connect to mqtt broker lost: %v", err)
+		fmt.Printf("Connect to mqtt broker lost: %v\n", err)
 	}
 
 	var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -61,8 +61,10 @@ func Start(
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
 	opts.SetClientID(clientID)
-	opts.SetUsername(user)
-	opts.SetPassword(password)
+	if user != "" && password != "" {
+		opts.SetUsername(user)
+		opts.SetPassword(password)
+	}
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
