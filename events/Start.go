@@ -33,6 +33,7 @@ func Start(
 
 	var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 		fmt.Printf("Connect to mqtt broker lost: %v\n", err)
+		panic(err)
 	}
 
 	var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
