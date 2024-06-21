@@ -5,7 +5,7 @@ RUN go mod download
 COPY . .
 RUN go build -o /dist/app .
 
-FROM alpine:3.20.0
+FROM alpine:3.20.1
 WORKDIR /dist
 COPY --from=builder /dist/app .
 CMD ["/dist/app"]
