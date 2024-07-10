@@ -4,6 +4,7 @@ import (
 	"app/sharedTypes"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -62,20 +63,53 @@ func SendAlert(
 		}
 		defer file.Close()
 
-		_, err = io.Copy(file, response.Body)
+		size, err := io.Copy(file, response.Body)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		fileUploadParams := slack.FileUploadParameters{
-			Filetype:       "image/jpg",
-			Filename:       "snapshot.jpg",
-			Channels:       []string{slackChannel},
-			InitialComment: messageText,
-			File:           imgFile,
+		if size > math.MaxInt32 {
+			fmt.Println("Snapshot file is too large to upload")
+			return
 		}
-		_, err = slackClient.UploadFile(fileUploadParams)
+
+		// Ideally, the cursor should be used to support teams with >200 channels
+		conversationsParams := slack.GetConversationsParameters{
+			Limit: 200,
+		}
+
+		channels, _, err := slackClient.GetConversations(&conversationsParams)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		channelId := ""
+		for _, channel := range channels {
+			if slackChannel == channel.Name {
+				channelId = channel.GroupConversation.Conversation.ID
+				break
+			}
+		}
+
+		if channelId == "" {
+			fmt.Println("Couldn't find slack channel")
+		}
+
+		fileUploadV2Params := slack.UploadFileV2Parameters{
+			File:           imgFile,
+			FileSize:       int(size),
+			Filename:       "snapshot.jpg",
+			InitialComment: messageText,
+			Channel: 	    channelId,
+		}
+
+		_, err = slackClient.UploadFileV2(fileUploadV2Params)
 		if err != nil {
 			fmt.Println(err)
 			return
