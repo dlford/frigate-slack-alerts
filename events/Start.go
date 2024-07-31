@@ -24,7 +24,7 @@ func Start(
 	internalBaseURL string,
 	externalBaseURL string,
 	slackToken string,
-	slackChannel string,
+	slackChannelID string,
 	filters sharedTypes.FilterConfig,
 ) {
 	var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
@@ -50,7 +50,7 @@ func Start(
 		values, shouldSend := filter.FilterMessage(message, filters)
 		if shouldSend {
 			alert.SendAlert(
-				slackChannel,
+				slackChannelID,
 				slackToken,
 				values,
 				internalBaseURL,

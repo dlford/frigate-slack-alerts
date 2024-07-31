@@ -17,7 +17,7 @@ import (
 // TODO: Add buttons to link to external url paths
 
 func SendAlert(
-	slackChannel string,
+	slackChannelID string,
 	slackToken string,
 	values sharedTypes.TrackedEvent,
 	internalBaseURL string,
@@ -44,7 +44,7 @@ func SendAlert(
 	slackClient := slack.New(slackToken)
 
 	if !values.HasSnapshot {
-		slackClient.PostMessage(slackChannel, slack.MsgOptionText(messageText, false))
+		slackClient.PostMessage(slackChannelID, slack.MsgOptionText(messageText, false))
 	} else {
 		imgURL := fmt.Sprintf("%s/api/events/%s/snapshot.jpg", internalBaseURL, values.ID)
 		imgFile := fmt.Sprintf("/tmp/%s.jpg", values.ID)
@@ -74,39 +74,12 @@ func SendAlert(
 			return
 		}
 
-		// Ideally, the cursor should be used to support teams with >200 channels
-		conversationsParams := slack.GetConversationsParameters{
-			Limit: 200,
-		}
-
-		channels, _, err := slackClient.GetConversations(&conversationsParams)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		channelId := ""
-		for _, channel := range channels {
-			if slackChannel == channel.Name {
-				channelId = channel.GroupConversation.Conversation.ID
-				break
-			}
-		}
-
-		if channelId == "" {
-			fmt.Println("Couldn't find slack channel")
-		}
-
 		fileUploadV2Params := slack.UploadFileV2Parameters{
 			File:           imgFile,
 			FileSize:       int(size),
 			Filename:       "snapshot.jpg",
 			InitialComment: messageText,
-			Channel: 	    channelId,
+			Channel: 	    slackChannelID,
 		}
 
 		_, err = slackClient.UploadFileV2(fileUploadV2Params)

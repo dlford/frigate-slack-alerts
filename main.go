@@ -25,7 +25,7 @@ func main() {
 		cfg.Frigate_Internal_BaseURL,
 		cfg.Frigate_External_BaseURL,
 		cfg.Slack_Token,
-		cfg.Slack_Channel,
+		cfg.Slack_Channel_ID,
 		cfg.Filters,
 	)
 	wg.Wait()

@@ -24,7 +24,7 @@ type Config struct {
 	Frigate_External_BaseURL string
 	Frigate_Topic_Prefix     string `default:"frigate"`
 	Slack_Token              string `required:"true"`
-	Slack_Channel            string `default:"frigate"`
+	Slack_Channel_ID         string `required:"true"`
 	Filter_Config_File       string
 	Filters                  FilterConfig
 }

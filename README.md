@@ -116,6 +116,9 @@ Not assosiated with Frigate or Slack.
           FSA_FRIGATE_INTERNAL_BASEURL: http://frigate:5000
           FSA_FRIGATE_EXTERNAL_BASEURL: 'https://frigate.yourdomain.com'
           FSA_SLACK_TOKEN: 'Your_Slack_OAuth_API_Token'
+          # Right click a channel in Slack and choose "View channel details",
+          # the ID will be at the bottom of that pane
+          FSA_SLACK_CHANNEL_ID: 'Your_Slack_Channel_ID'
       frigate:
         # ... See https://docs.frigate.video/frigate/installation
     ```
@@ -145,7 +148,7 @@ The following environment variables can be added to the `environment` section of
 - `FSA_FRIGATE_INTERNAL_BASEURL`: HTTP path to Frigate container, used for fetching snapshot images
 - `FSA_FRIGATE_EXTERNAL_BASEURL`: HTTP path to Frigate from the user end, you can use the IP address of your host if you don't have external access
 - `FSA_SLACK_TOKEN`: Slack OAuth API Token for your Slack App
-- `FSA_SLACK_CHANNEL`: Slack Channel to send alerts to (Slack App must be added to this channel)
+- `FSA_SLACK_CHANNEL_ID`: Slack Channel ID to send alerts to (Slack App must be added to this channel)
 - `FSA_FILTER_CONFIG_FILE`: Path to a filters config file, see below. This file must be mounted as a volume to the alerts container
 
 ### Filters
