@@ -27,6 +27,7 @@ func main() {
 		cfg.Slack_Token,
 		cfg.Slack_Channel_ID,
 		cfg.Filters,
+		cfg.Ignore_Events_Without_Snapshot,
 	)
 	wg.Wait()
 }

@@ -150,6 +150,7 @@ The following environment variables can be added to the `environment` section of
 - `FSA_SLACK_TOKEN`: Slack OAuth API Token for your Slack App
 - `FSA_SLACK_CHANNEL_ID`: Slack Channel ID to send alerts to (Slack App must be added to this channel)
 - `FSA_FILTER_CONFIG_FILE`: Path to a filters config file, see below. This file must be mounted as a volume to the alerts container
+- `FSA_IGNORE_EVENTS_WITHOUT_SNAPSHOT`: Boolean, skips alerts for events that don't have a snapshot image if set to `true`, default is `false`
 
 ### Filters
 

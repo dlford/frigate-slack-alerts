@@ -26,6 +26,7 @@ func Start(
 	slackToken string,
 	slackChannelID string,
 	filters sharedTypes.FilterConfig,
+	ignoreEventsWithoutSnapshot bool,
 ) {
 	var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 		fmt.Println("Connected to mqtt broker")
@@ -55,6 +56,7 @@ func Start(
 				values,
 				internalBaseURL,
 				externalBaseURL,
+				ignoreEventsWithoutSnapshot,
 			)
 		}
 	}

@@ -14,14 +14,13 @@ import (
 	"golang.org/x/text/language"
 )
 
-// TODO: Add buttons to link to external url paths
-
 func SendAlert(
 	slackChannelID string,
 	slackToken string,
 	values sharedTypes.TrackedEvent,
 	internalBaseURL string,
 	extenalBaseURL string,
+	ignoreEventsWithoutSnapshot bool,
 ) {
 	caser := cases.Title(language.English)
 
@@ -44,55 +43,61 @@ func SendAlert(
 	slackClient := slack.New(slackToken)
 
 	if !values.HasSnapshot {
+		if ignoreEventsWithoutSnapshot {
+			fmt.Printf("ignored because of missing snapshot:  %+v\n", values)
+			return
+		}
+
 		slackClient.PostMessage(slackChannelID, slack.MsgOptionText(messageText, false))
-	} else {
-		imgURL := fmt.Sprintf("%s/api/events/%s/snapshot.jpg", internalBaseURL, values.ID)
-		imgFile := fmt.Sprintf("/tmp/%s.jpg", values.ID)
+		return
+	}
 
-		response, err := http.Get(imgURL)
-		if err != nil {
+	imgURL := fmt.Sprintf("%s/api/events/%s/snapshot.jpg", internalBaseURL, values.ID)
+	imgFile := fmt.Sprintf("/tmp/%s.jpg", values.ID)
+
+	response, err := http.Get(imgURL)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer response.Body.Close()
+
+	file, err := os.Create(imgFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	size, err := io.Copy(file, response.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if size > math.MaxInt32 {
+		fmt.Println("Snapshot file is too large to upload")
+		return
+	}
+
+	fileUploadV2Params := slack.UploadFileV2Parameters{
+		File:           imgFile,
+		FileSize:       int(size),
+		Filename:       "snapshot.jpg",
+		InitialComment: messageText,
+		Channel:        slackChannelID,
+	}
+
+	_, err = slackClient.UploadFileV2(fileUploadV2Params)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if imgFile != "" {
+		if err := os.Remove(imgFile); err != nil {
 			fmt.Println(err)
 			return
-		}
-		defer response.Body.Close()
-
-		file, err := os.Create(imgFile)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer file.Close()
-
-		size, err := io.Copy(file, response.Body)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if size > math.MaxInt32 {
-			fmt.Println("Snapshot file is too large to upload")
-			return
-		}
-
-		fileUploadV2Params := slack.UploadFileV2Parameters{
-			File:           imgFile,
-			FileSize:       int(size),
-			Filename:       "snapshot.jpg",
-			InitialComment: messageText,
-			Channel: 	    slackChannelID,
-		}
-
-		_, err = slackClient.UploadFileV2(fileUploadV2Params)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if imgFile != "" {
-			if err := os.Remove(imgFile); err != nil {
-				fmt.Println(err)
-				return
-			}
 		}
 	}
 }
